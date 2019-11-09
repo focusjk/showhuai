@@ -1,83 +1,76 @@
 import React from 'react';
-import { Button, Card, Image, Icon, Search, Dropdown } from 'semantic-ui-react'
+import { Button, Card, Image, Icon, Search, Dropdown, Input } from 'semantic-ui-react'
 import ProductItem from './ProductItem'
+import axios from 'axios';
+import { url } from '../constant'
 class Home extends React.Component {
 
-  state = { isLoading: false, results: [], value: '' }
-  handleResultSelect = (e, { result }) => this.setState({ value: result.title })
-
-  handleSearchChange = (e, { value }) => {
-    this.setState({ isLoading: true, value })
-
-    setTimeout(() => {
-      // if (this.state.value.length < 1) return this.setState(initialState)
-
-      // const re = new RegExp(_.escapeRegExp(this.state.value), 'i')
-      // const isMatch = (result) => re.test(result.title)
-
-      this.setState({
-        isLoading: false,
-        results: []
-      })
-    }, 300)
+  state = {
+    isLoading: false,
+    results: [],
+    searchWord: '',
+    searchType: {},
+    productList: [],
+    typeProductList: []
+  }
+  async componentDidMount() {
+    const productResult = await axios.get(url + '/product')
+    const productList = productResult.data
+    //TODO : GET Type of product
+    this.setState({
+      typeProductList: [
+        { ID: 1, Name: "focus", Detail: "sdlfnjsdhfkj" },
+        { ID: 2, Name: "fogdcus", Detail: "sdlfnjsdhfkj" }]
+    })
+    //--------------------------
+    this.setState({ productList: productList })
+  }
+  handleSelectType = (e, { value, text }) => {
+    // TODO: query
+    this.setState({ searchType: { ID: value ? value : null, Name: text } })
+  }
+  handleSearch = (e, { value }) => {
+    this.setState({ searchWord: value })
   }
 
+  handleOnSearch = () => {
+    console.log(this.state.searchWord)
+    this.setState({ isLoading: true })
+    // TODO : query
+    this.setState({ isLoading: false })
+  }
+
+  handleAddToCart = (Product_ID, Amount) => {
+    //TODO
+  }
 
   render() {
-    const filteredProduct = [
-      {
-        id: 1,
-        name: 'Project Report - April',
-        detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-        price: '100',
-        isFavorite: true,
-        isInCart: false
-      },
-      {
-        id: 2,
-        name: 'Project Report - April',
-        detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-        price: '100',
-        isFavorite: true,
-        isInCart: false
-      },
-      {
-        id: 3,
-        name: 'Project Report - April',
-        detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-        price: '100',
-        isFavorite: false,
-        isInCart: true
-      },
-      {
-        id: 4,
-        name: 'Project Report - April',
-        detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-        price: '100',
-        isFavorite: false,
-        isInCart: true
-      }
-    ]
-    const { isLoading, results, value } = this.state;
+    const { isLoading, searchType, searchWord, productList, typeProductList } = this.state;
     return (
-      <div className="App" style={{ display: "flex", flexDirection: "column", margin: "2%", width: "100%" }}>
+      <div className="App" style={{ display: "flex", flexDirection: "column", width: "100%" }}>
         <div style={{ margin: "50px 0 50px 0 ", display: "flex", alignItems: "center" }}>
-          <Search
+          <Input
+            icon={<Icon key="searchIcon" name='search' color="teal" inverted circular link onClick={this.handleOnSearch} />}
+            placeholder='Search...'
+            style={{ marginRight: "10px " }}
+            onChange={this.handleSearch}
             loading={isLoading}
-            onResultSelect={this.handleResultSelect}
-            placeholder='Name'
-            // onSearchChange={}
-            results={results}
-            value={value}
-            style={{ marginRight: "10px ", display: "flex" }}
+            value={searchWord}
+            key="searchInput"
           />
-          <Dropdown placeholder='Type' search selection options={filteredProduct.map(item => ({ value: item.name, text: item.id }))} />
-          {/* <Button circular icon='cart' /> */}
-          <Icon circular inverted color="blue" size='big' name='shopping cart' style={{ marginLeft: "10px", borderRadius: "100%" }} />
+          <Dropdown
+            key="Type"
+            placeholder='Type'
+            clearable
+            selection
+            options={typeProductList.map(item => ({ key: item.ID, value: item.ID, text: item.Name }))}
+            onChange={this.handleSelectType}
+            value={searchType.Name}
+          />
         </div>
-        <Card.Group style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
+        <Card.Group style={{ display: "flex", justifyContent: "flex-start", flexWrap: "wrap" }}>
           {
-            filteredProduct.map(item => (<ProductItem {...item} />))
+            productList.map(item => (<ProductItem {...item} handleAddToCart={this.handleAddToCart} />))
           }
         </Card.Group>
       </div>
