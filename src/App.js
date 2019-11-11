@@ -6,6 +6,9 @@ import Navbar from './component/Navbar';
 import Review from './component/Review';
 import Login from './component/Login';
 import Cart from './component/Cart';
+import Sending from './component/Sending';
+import Managing from './component/Managing';
+import Promotion from './component/Promotion';
 import axios from 'axios';
 import { url } from './constant'
 import 'semantic-ui-css/semantic.min.css';
@@ -24,12 +27,13 @@ class App extends React.Component {
     this.setState({ User: null })
     history.push('/login')
   }
-  handleLogin = async data => {
+  handleLogin = async ({ isAdmin, ...data }) => {
     const result = await axios.post(url + '/user/login', data)
-    const { success, isAdmin, ...User } = result.data
+    const { success, ...User } = result.data
+
     if (success) {
-      console.log(User)
-      this.setState({ User: User })
+      console.log(isAdmin)
+      this.setState({ User: { isAdmin, ...User } })
       history.push('/home')
     } else {
       // TODO: show error
@@ -45,11 +49,26 @@ class App extends React.Component {
             {User &&
               <Fragment>
                 <Route path="/cart">
-                  <Cart />
+                  <Cart user={User} />
                 </Route>
-                <Route path="/review">
-                  <Review />
-                </Route>
+                {!User.isAdmin &&
+                  <Route path="/review">
+                    <Review />
+                  </Route>
+                }
+                {User.isAdmin &&
+                  <Fragment>
+                    <Route path="/sending">
+                      <Sending />
+                    </Route>
+                    <Route path="/managing">
+                      <Managing />
+                    </Route>
+                    <Route path="/promotion">
+                      <Promotion />
+                    </Route>
+                  </Fragment>
+                }
                 <Route path="/invoice">
                   <Invoice />
                 </Route>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Button, Card, Image, Icon, Search, Modal, Dropdown } from 'semantic-ui-react'
 import CartItem from './CartItem'
 class Cart extends React.Component {
@@ -8,7 +8,9 @@ class Cart extends React.Component {
         Total_price: 0,
         open: false,
         promotionList: [],
-        promotion: { Name: "", ID: null }
+        promotion: { Name: "", ID: null },
+        supplierList: [],
+        supplier: { Name: "", ID: null }
     }
     componentDidMount() {
         //TODO: GET product in cart
@@ -30,7 +32,8 @@ class Cart extends React.Component {
                     Amount: 2
                 }
             ],
-            promotionList: [{ ID: 1, Name: "DDDDD", Discount: 100, Detail: "AAAAAAAA" }, { ID: 2, Name: "DDDDD", Discount: 100, Detail: "AAAAAAAA" }]
+            promotionList: [{ ID: 1, Name: "DDDDD", Discount: 100, Detail: "AAAAAAAA" }, { ID: 2, Name: "DDDDD", Discount: 100, Detail: "AAAAAAAA" }],
+            supplierList: [{ ID: 1, Name: "DDDDD", Email: "AAAAAAAA" }, { ID: 2, Name: "DDDDD", Email: "AAAAAAAA" }]
         })
         //----------------
     }
@@ -51,20 +54,22 @@ class Cart extends React.Component {
         this.setState({ open: false })
 
     }
-    handleSelect = (e, { value, text }) => {
+    handleSelect = (e, { value, text, name }) => {
         // TODO: query
-        this.setState({ promotion: { ID: value ? value : null, Name: text } })
+        console.log('name', name)
+        this.setState({ [name]: { ID: value ? value : null, Name: text } })
     }
 
     render() {
-        const { list, Total_price, open, promotionList, promotion } = this.state;
+        const { list, Total_price, open, promotionList, promotion, supplierList, supplier } = this.state;
+        const { user } = this.props
         return (
             <div style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: "5vh" }}>
                 <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px", alignItems: "center" }}>
                     Total price: {Total_price} Baht
                     <Modal
                         open={open}
-                        size="small"
+                        size="tiny"
                         trigger={
                             <Button
                                 content='Buy'
@@ -74,18 +79,35 @@ class Cart extends React.Component {
                             />
                         }
                         header={
-                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "40px" }}>
+                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "40px", flexWrap: "wrap" }}>
                                 <h2 style={{ margin: "0 10px 0 0" }}>Promotion</h2>
                                 <Dropdown
                                     key="Type"
                                     placeholder='Promotion'
                                     clearable
                                     selection
+                                    name='promotion'
                                     options={promotionList.map(item => ({ key: item.ID, value: item.ID, text: item.Name + ' : ' + item.Detail + ' : ' + item.Discount }))}
                                     onChange={this.handleSelect}
                                     value={promotion.Name}
                                 />
-                            </div>}
+                                {user.isAdmin &&
+                                    <Fragment style={{ margin: "20px 10px 0 0" }}>
+                                        <h2 >Supplier</h2>
+                                        <Dropdown
+                                            key="Type"
+                                            placeholder='Supplier'
+                                            clearable
+                                            selection
+                                            name='supplier'
+                                            options={supplierList.map(item => ({ key: item.ID, value: item.ID, text: item.Name }))}
+                                            onChange={this.handleSelect}
+                                            value={supplier.Name}
+                                        />
+                                    </Fragment>
+                                }
+                            </div>
+                        }
                         actions={
                             < div style={{ display: "flex", justifyContent: "center", margin: "40px 0" }}>
                                 <Button onClick={() => this.setState({ open: false })}>

@@ -17,6 +17,10 @@ export default class Navbar extends Component {
             this.setState({ [name]: value })
         }
     }
+    handleLogout = () => {
+        this.setState({ activeItem: 'home', Username: "", Password: "", isAdmin: false })
+        this.props.handleLogout()
+    }
 
     render() {
         const { activeItem, Username, Password, isAdmin } = this.state
@@ -48,13 +52,40 @@ export default class Navbar extends Component {
                                     onClick={this.handleItemClick}
                                 />
                             </Link>
-                            <Link to="/review">
-                                <Menu.Item
-                                    name='review'
-                                    active={activeItem === 'review'}
-                                    onClick={this.handleItemClick}
-                                />
-                            </Link>
+                            {!isAdmin &&
+                                <Link to="/review">
+                                    <Menu.Item
+                                        name='review'
+                                        active={activeItem === 'review'}
+                                        onClick={this.handleItemClick}
+                                    />
+                                </Link>
+                            }
+                            {isAdmin &&
+                                <Fragment>
+                                    <Link to="/sending">
+                                        <Menu.Item
+                                            name='sending'
+                                            active={activeItem === 'sending'}
+                                            onClick={this.handleItemClick}
+                                        />
+                                    </Link>
+                                    <Link to="/managing">
+                                        <Menu.Item
+                                            name='managing'
+                                            active={activeItem === 'managing'}
+                                            onClick={this.handleItemClick}
+                                        />
+                                    </Link>
+                                    <Link to="/promotion">
+                                        <Menu.Item
+                                            name='promotion'
+                                            active={activeItem === 'promotion'}
+                                            onClick={this.handleItemClick}
+                                        />
+                                    </Link>
+                                </Fragment>
+                            }
                             <Menu.Menu position='right'>
                                 <Menu.Item>
                                     Hi! {user.Firstname + "  " + user.Lastname}
@@ -63,7 +94,7 @@ export default class Navbar extends Component {
                                     <Menu.Item
                                         name='logout'
                                         active={activeItem === 'logout'}
-                                        onClick={this.props.handleLogout}
+                                        onClick={this.handleLogout}
                                     >
                                         Logout
                             </Menu.Item>
