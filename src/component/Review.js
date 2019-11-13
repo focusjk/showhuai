@@ -49,7 +49,7 @@ class Review extends React.Component {
     }
 
     handleOnSubmit = index => {
-        //TODO 
+        //TODO fgkdrfgkj
     }
     handleRate = (e, { rating, maxRating, index }) => {
         //TODO
