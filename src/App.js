@@ -28,19 +28,18 @@ class App extends React.Component {
     history.push('/login')
   }
   handleLogin = async ({ isAdmin, ...data }) => {
-    //TODO
-    // const result = await axios.post(url + '/user/login', data)
-    // const { success, ...User } = result.data
+    const result = await axios.post(url + '/user/login', data)
+    const { success, ...User } = result.data
     // console.log(result.data)
-    const { success, ...User } = {
-      Email: "member1@gmail.com",
-      Firstname: "Ming",
-      ID: 2,
-      Lastname: "Mingming",
-      Phone_number: "0811234567",
-      Username: "ming",
-      success: true
-    }
+    // const { success, ...User } = {
+    //   Email: "member1@gmail.com",
+    //   Firstname: "Ming",
+    //   ID: 2,
+    //   Lastname: "Mingming",
+    //   Phone_number: "0811234567",
+    //   Username: "ming",
+    //   success: true
+    // }
 
     if (success) {
       console.log(isAdmin)
