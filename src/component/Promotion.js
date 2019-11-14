@@ -6,7 +6,7 @@ class Promotion extends React.Component {
     render() {
         return (
             <div style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: "5vh" }}>
-                Add+show promotions
+                Promotions
             </div>
         );
     }

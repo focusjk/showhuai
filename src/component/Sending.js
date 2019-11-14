@@ -8,6 +8,7 @@ class Sending extends React.Component {
             <div style={{ display: "flex", flexDirection: "column", width: "100%", marginTop: "5vh" }}>
                 creating sending round (choose invoice+ messenger+ car)
                 Showing the sending round
+                {/* TODOBYJANE */}
             </div>
         );
     }
