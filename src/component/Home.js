@@ -6,10 +6,10 @@ import { url } from '../constant'
 class Home extends React.Component {
 
   state = {
-    isLoading: false,
+    loading: false,
     results: [],
     searchWord: '',
-    searchType: {},
+    searchType: null,
     productList: [],
     typeProductList: []
   }
@@ -25,27 +25,33 @@ class Home extends React.Component {
     //--------------------------
     this.setState({ productList: productList })
   }
+  queryData = (keyword, type) => {
+    this.setState({ loading: true })
+    console.log(keyword, type)
+    // TODO
+    // const queryList = await axios.get(url + '/product', {params: {type: value, keyword: searchWord }})
+    // this.setState({productList: queryList})
+    this.setState({ loading: false })
+  }
+
   handleSelectType = (e, { value, text }) => {
-    // TODO: query
-    this.setState({ searchType: { ID: value ? value : null, Name: text } })
+    const { searchWord } = this.state
+    this.queryData(searchWord, value)
+    this.setState({ searchType: value ? value : null })
   }
   handleSearch = (e, { value }) => {
     this.setState({ searchWord: value })
   }
 
   handleOnSearch = () => {
-    console.log(this.state.searchWord)
-    this.setState({ isLoading: true })
-    // TODO : query
-    this.setState({ isLoading: false })
+    const { searchWord, searchType } = this.state
+    this.queryData(searchWord, searchType)
   }
 
-  handleAddToCart = (Product_ID, Amount) => {
-    //TODO
-  }
+  handleAddToCart = (Product_ID, Amount) => { }
 
   render() {
-    const { isLoading, searchType, searchWord, productList, typeProductList } = this.state;
+    const { loading, searchType, searchWord, productList, typeProductList } = this.state;
     return (
       <div className="App" style={{ display: "flex", flexDirection: "column", width: "100%" }}>
         <div style={{ margin: "50px 0 50px 0 ", display: "flex", alignItems: "center" }}>
@@ -54,7 +60,7 @@ class Home extends React.Component {
             placeholder='Search...'
             style={{ marginRight: "10px " }}
             onChange={this.handleSearch}
-            loading={isLoading}
+            loading={loading}
             value={searchWord}
             key="searchInput"
           />
@@ -65,7 +71,7 @@ class Home extends React.Component {
             selection
             options={typeProductList.map(item => ({ key: item.ID, value: item.ID, text: item.Name }))}
             onChange={this.handleSelectType}
-            value={searchType.Name}
+            value={searchType}
           />
         </div>
         <Card.Group style={{ display: "flex", justifyContent: "flex-start", flexWrap: "wrap" }}>

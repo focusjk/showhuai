@@ -5,8 +5,6 @@ class Invoice extends React.Component {
 
     state = { isLoading: false, invoiceList: [], value: '' }
     componentDidMount() {
-        // TODO GET data
-        //mock data
         this.setState({
             invoiceList: [
                 {

@@ -16,6 +16,7 @@ export default class Navbar extends Component {
         } else {
             this.setState({ [name]: value })
         }
+        this.props.removeError()
     }
     handleLogout = () => {
         this.setState({ activeItem: 'home', Username: "", Password: "", isAdmin: false })
@@ -24,7 +25,7 @@ export default class Navbar extends Component {
 
     render() {
         const { activeItem, Username, Password, isAdmin } = this.state
-        const { user } = this.props
+        const { user, error } = this.props
 
         return (
             <Segment inverted style={{ borderRadius: 0, margin: "0", color: "white" }}>
@@ -87,9 +88,15 @@ export default class Navbar extends Component {
                                 </Fragment>
                             }
                             <Menu.Menu position='right'>
-                                <Menu.Item>
-                                    Hi! {user.Firstname + "  " + user.Lastname}
-                                </Menu.Item>
+                                <Link to="/profile">
+                                    <Menu.Item
+                                        name='profile'
+                                        active={activeItem === 'profile'}
+                                        onClick={this.handleItemClick}
+                                    >
+                                        Hi! {user.Firstname + "  " + user.Lastname}
+                                    </Menu.Item>
+                                </Link>
                                 <Link to="/login" >
                                     <Menu.Item
                                         name='logout'
@@ -112,11 +119,13 @@ export default class Navbar extends Component {
                                 >
                                     <Form.Group>
                                         <Form.Input
+                                            error={error}
                                             placeholder='Username'
                                             name='Username'
                                             onChange={this.handleChange}
                                         />
                                         <Form.Input
+                                            error={error}
                                             type="password"
                                             placeholder='Password'
                                             name='Password'

@@ -13,8 +13,6 @@ class Cart extends React.Component {
         supplier: { Name: "", ID: null }
     }
     componentDidMount() {
-        //TODO: GET product in cart
-        //mock data
         this.setState({
             list: [
                 {
@@ -44,7 +42,6 @@ class Cart extends React.Component {
     }
 
     handleSaveAmount = (Product_ID, index) => {
-        // TODO : API
         console.log("hiii")
     }
 
@@ -55,7 +52,6 @@ class Cart extends React.Component {
 
     }
     handleSelect = (e, { value, text, name }) => {
-        // TODO: query
         console.log('name', name)
         this.setState({ [name]: { ID: value ? value : null, Name: text } })
     }
