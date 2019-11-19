@@ -4,7 +4,6 @@ import ProductItem from './ProductItem'
 import axios from 'axios';
 import { url } from '../constant'
 class Home extends React.Component {
-
   state = {
     loading: false,
     results: [],
@@ -14,24 +13,16 @@ class Home extends React.Component {
     typeProductList: []
   }
   async componentDidMount() {
-    const productResult = await axios.get(url + '/product')
-    const productList = productResult.data
-    //TODO : GET Type of product
-    this.setState({
-      typeProductList: [
-        { ID: 1, Name: "focus", Detail: "sdlfnjsdhfkj" },
-        { ID: 2, Name: "fogdcus", Detail: "sdlfnjsdhfkj" }]
-    })
-    //--------------------------
-    this.setState({ productList: productList })
+    await this.queryData('', null)
+    const typeResult = await axios.get(url + '/product/type')
+    const typeProductList = typeResult.data
+    this.setState({ typeProductList })
   }
-  queryData = (keyword, type) => {
+  queryData = async (keyword, type) => {
     this.setState({ loading: true })
-    console.log(keyword, type)
-    // TODO
-    // const queryList = await axios.get(url + '/product', {params: {type: value, keyword: searchWord }})
-    // this.setState({productList: queryList})
-    this.setState({ loading: false })
+    const productResult = await axios.get(url + '/product', { params: { type, keyword } })
+    const productList = productResult.data
+    this.setState({ productList, loading: false })
   }
 
   handleSelectType = (e, { value, text }) => {
