@@ -20,10 +20,10 @@ class Profile extends React.Component {
     }
     handleChange = (e, { name, value }) => this.setState({ form: { ...this.state.form, [name]: value }, message: '' })
     handleSave = async () => {
-        const { form } = this.state
+        const { Position, SSN, ...body } = this.state.form
         this.setState({ loading: true })
-        const { data } = await axios.post(url + '/user/profile/edit', form)
-        const success = data.success
+        const { data } = await axios.post(url + '/user/profile/edit', body)
+        const { success } = data
         if (success) {
             this.setState({ message: 'Successfully save your profile' })
             this.props.handleEditUser(this.state.form)
@@ -168,7 +168,7 @@ class Profile extends React.Component {
                                     placeholder='Password'
                                     name='Password'
                                     onChange={this.handleChange}
-                                // value={form.Password}
+                                    value={form.Password}
                                 />
                             </Form.Group>
                             <Container textAlign='center'>
