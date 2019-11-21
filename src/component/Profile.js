@@ -4,46 +4,26 @@ import { Button, Card, Image, Icon, Search, Grid, Input, Form, Segment, Containe
 import ProductItem from './ProductItem'
 import Modal from './Modal'
 import axios from 'axios';
+import { url } from '../constant'
 class Profile extends React.Component {
 
     state = { form: {}, loading: false, isAdmin: false, open: false, message: '' }
     async componentDidMount() {
         const ID = this.props.ID;
-        // const User = await axios.get(url + '/userTODO')
-        const User = {
-            ID: 1,
-            Username: 'focus',
-            Phone_number: '0812345678',
-            Email: 'jirapahat@gmail.com',
-            Firstname: 'Jiraphat',
-            Lastname: 'Khupanit',
-            Zipcode: '234234',
-            Address_number: '342424',
-            Province: 'bangkok',
-            Street: '123213'
-        }
-        // const User = {
-        //     ID: 1,
-        //     Username: 'focus',
-        //     Phone_number: '0812345678',
-        //     Email: 'jirapahat@gmail.com',
-        //     Firstname: 'Jiraphat',
-        //     Lastname: 'Khupanit',
-        //     SSN: '1234567654321',
-        //     Position: 'Manager'
-        // }
-        const isAdmin = !!User.SSN
-        this.setState({ form: User, isAdmin })
+        const { data } = await axios.get(url + '/user/profile', {
+            params: {
+                ID
+            }
+        })
+        const isAdmin = !!data.SSN
+        this.setState({ form: data, isAdmin })
     }
-    // handleChange = (field, value) => this.setState({ form: { ...this.state.form, [field]: value } })
     handleChange = (e, { name, value }) => this.setState({ form: { ...this.state.form, [name]: value }, message: '' })
-    handleSave = () => {
+    handleSave = async () => {
         const { form } = this.state
-        console.log(this.state.form)
         this.setState({ loading: true })
-        // TODO: API
-        // const newUser = await axios.post(url + '/user', {form})
-        const success = true
+        const { data } = await axios.post(url + '/user/profile/edit', form)
+        const success = data.success
         if (success) {
             this.setState({ message: 'Successfully save your profile' })
             this.props.handleEditUser(this.state.form)
@@ -175,10 +155,10 @@ class Profile extends React.Component {
                                     required
                                     control={Input}
                                     label='Username'
-                                    placeholder={form.Username}
+                                    placeholder='Username'
                                     name='Username'
                                     onChange={this.handleChange}
-                                // value={form.Username}s
+                                    value={form.Username}
                                 />
                                 <Form.Field
                                     required
@@ -188,7 +168,7 @@ class Profile extends React.Component {
                                     placeholder='Password'
                                     name='Password'
                                     onChange={this.handleChange}
-                                    value={form.Password}
+                                // value={form.Password}
                                 />
                             </Form.Group>
                             <Container textAlign='center'>
