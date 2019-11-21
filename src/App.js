@@ -58,7 +58,7 @@ class App extends React.Component {
                 </Route>
                 {!User.isAdmin &&
                   <Route path="/review">
-                    <Review />
+                    <Review user={User} />
                   </Route>
                 }
                 {User.isAdmin &&
