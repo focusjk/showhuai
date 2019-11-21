@@ -89,7 +89,7 @@ class Invoice extends React.Component {
     }
 
     render() {
-        const tableHeaderList = ["Id", "Name", "Price", "Amount", "Total price"]
+        const tableHeaderList = ["ID", "Name", "Price", "Amount (baht)", "Total price"]
         const { isLoading, invoiceList, value } = this.state;
         return (
             <div style={{ display: "flex", flexDirection: "column", margin: "5vh 40vh" }}>
@@ -141,9 +141,9 @@ class Invoice extends React.Component {
                                                 </Table.Row>
                                             </Table.Header>
                                             <Table.Body>
-                                                {Transaction.map(({ Amount, Product: { Id, Name, Price } }) => (
+                                                {Transaction.map(({ Amount, Product: { ID, Name, Price } }) => (
                                                     <Table.Row>
-                                                        <Table.Cell>{Id}</Table.Cell>
+                                                        <Table.Cell>{ID}</Table.Cell>
                                                         <Table.Cell>{Name}</Table.Cell>
                                                         <Table.Cell>{Price}</Table.Cell>
                                                         <Table.Cell>{Amount}</Table.Cell>
