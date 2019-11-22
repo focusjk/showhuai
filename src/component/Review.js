@@ -2,61 +2,27 @@ import React from 'react';
 import { Button, Card, Image, Icon, Search, Table, Label, Rating, Message, TextArea, Form } from 'semantic-ui-react'
 import ProductItem from './ProductItem'
 import axios from 'axios';
+import { url } from '../constant'
 class Review extends React.Component {
 
     state = { list: [], value: '', open: true }
-    componentDidMount() {
-        //TODO: GET list of product ที่เคย review หรือ review ได้
-        // const list = await axios.get(url + '/')
-        // mock data
-        const list = [
-            {
-                id: 1,
-                name: 'Project Report - April',
-                detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-                price: '100',
-                rating: 3,
-                comment: "dsfjkhsd"
-            },
-            {
-                id: 2,
-                name: 'Project Report - April',
-                detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-                price: '100',
-                number: 3,
-                rating: null,
-                comment: null
-            },
-            {
-                id: 3,
-                name: 'Project Report - April',
-                detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-                price: '100',
-                number: 3,
-                rating: null,
-                comment: null
-            },
-            {
-                id: 4,
-                name: 'Project Report - April',
-                detail: 'Leverage agile frameworks to provide a robust synopsis for high level overviews.',
-                price: '100',
-                number: 3,
-                rating: null,
-                comment: null
-            }
-        ]
-        const editedList = list.map(i => ({ ...i, saved: !!i.rating, message: null }))
+    async componentDidMount() {
+        const { ID } = this.props.user
+        const result = await axios.get(url + '/review', { params: { userId: ID } })
+        const { data } = result
+        console.log(data)
+        const list = data
+        const editedList = list.map(i => ({ ...i, saved: !!i.Review_ID, message: null }))
         this.setState({ list: editedList })
     }
 
-    handleOnSubmit = index => {
+    handleOnSubmit = async index => {
         const list = this.state.list;
-        const { saved, rating, ...detail } = list[index]
+        const { Member_ID, Invoice_ID, Product_ID, rating, Detail } = list[index]
         const newRating = rating ? rating : 1
-        // TODO
-        // const success = await axios.post(url + '/', {...detail, rating: newRating})
-        const success = true
+        const result = await axios.post(url + '/review', { Member_ID, Invoice_ID, Product_ID, Rating: newRating, Detail })
+        const { success } = result.data
+        console.log(result)
         const editedList = list
         if (success) {
             editedList[index] = { ...editedList[index], saved: true, rating: newRating }
@@ -72,7 +38,7 @@ class Review extends React.Component {
     }
     handleComment = (e, { index, value }) => {
         const list = this.state.list;
-        list[index] = { ...list[index], comment: value ? value : null, message: null }
+        list[index] = { ...list[index], Detail: value ? value : null, message: null }
         this.setState({ list })
         console.log(this.state.list)
     }
@@ -80,22 +46,22 @@ class Review extends React.Component {
         const { list, value } = this.state;
         return (
             <div className="App" style={{ display: "flex", flexDirection: "column", marginTop: "5vh" }}>
-                <Card.Group style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
+                <Card.Group style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
                     {
-                        list.map(({ id, name, price, detail, number, rating, comment, saved, message }, index) => (
-                            <Card key={id} style={{ padding: "10px" }}>
+                        list.map(({ Product_Name, Price, Product_Detail, rating, Detail, saved, message, Invoice_ID }, index) => (
+                            <Card style={{ padding: "10px" }}>
                                 <Card.Header style={{ display: "flex", justifyContent: "space-between", padding: "10px" }}>
-                                    {name}
-                                    <Label tag  >{price + " Baht"}</Label>
+                                    {Product_Name}
+                                    <Label tag  >{Price + " Baht"}</Label>
                                 </Card.Header>
-                                <Card.Content description={detail} />
+                                <Card.Content description={<div><div>Invoice id : {Invoice_ID}</div><div>{Product_Detail}</div></div>} />
                                 <Card.Content extra>
                                     {saved &&
                                         <div>
                                             <Rating disabled maxRating={5} defaultRating={rating} icon='star' size='large' />
                                             <Message>
                                                 <p>
-                                                    {comment}
+                                                    {Detail}
                                                 </p>
                                             </Message>
                                         </div>}

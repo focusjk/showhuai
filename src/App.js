@@ -20,6 +20,10 @@ import {
   Link
 } from "react-router-dom";
 import history from './history'
+<<<<<<< HEAD
+=======
+// import 'bootstrap/dist/css/bootstrap.min.css';
+>>>>>>> master
 
 class App extends React.Component {
   state = { User: null, error: false }
@@ -57,7 +61,7 @@ class App extends React.Component {
                 </Route>
                 {!User.isAdmin &&
                   <Route path="/review">
-                    <Review />
+                    <Review user={User} />
                   </Route>
                 }
                 {User.isAdmin &&
