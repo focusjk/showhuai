@@ -20,7 +20,6 @@ import {
   Link
 } from "react-router-dom";
 import history from './history'
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 class App extends React.Component {
   state = { User: null, error: false }
