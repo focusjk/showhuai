@@ -20,10 +20,6 @@ import {
   Link
 } from "react-router-dom";
 import history from './history'
-<<<<<<< HEAD
-=======
-// import 'bootstrap/dist/css/bootstrap.min.css';
->>>>>>> master
 
 class App extends React.Component {
   state = { User: null, error: false }
@@ -32,12 +28,11 @@ class App extends React.Component {
     this.setState({ User: null })
     history.push('/login')
   }
-  handleLogin = async ({ isAdmin, ...data }) => {
+  handleLogin = async data => {
     const result = await axios.post(url + '/user/login', data)
     const { success, ...User } = result.data
     if (success) {
-      console.log(isAdmin)
-      this.setState({ User: { isAdmin, ...User } })
+      this.setState({ User: { ...User } })
       history.push('/home')
     } else {
       this.setState({ error: true })

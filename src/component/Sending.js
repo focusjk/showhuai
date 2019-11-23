@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, Card, Image, Icon, Search, Modal, Dropdown, Table } from "semantic-ui-react";
+import { Button, Card, Image, Icon, Search, Dropdown, Table } from "semantic-ui-react";
 import CartItem from "./CartItem";
 import Invoice from "./Invoice";
+import Modal from './Modal'
 import { send } from "q";
 import axios from 'axios';
 import { url } from '../constant';
@@ -9,7 +10,7 @@ import DateTimePicker from 'react-datetime-picker';
 
 class Sending extends React.Component {
   state = {
-    selectedInvoice: null,
+    selectedInvoice: [],
     selectedMessenger: null,
     selectedCar: null,
     invoices: [],
@@ -19,64 +20,98 @@ class Sending extends React.Component {
     isLoading: false,
     isInserting: false,
     departTime: new Date(),
-    arriveTime: new Date()
+    arriveTime: new Date(),
+    open: false,
+    modalID: null
   };
 
   onChange = (type, date) => {
     this.setState({ [type]: date })
   }
 
-  selectHandler = (e, { name, value, text }) => {
+  toDate = a => {
+    const aa = new Date(a)
+    const d = aa.getDate()
+    const m = aa.getMonth() + 1
+    const y = aa.getFullYear()
+    const h = aa.getHours()
+    const hh = h < 10 ? '0' + h : h
+    const mm = aa.getMinutes()
+    const mn = mm < 10 ? '0' + mm : mm
+    return y + "-" + m + "-" + d + " " + hh + ":" + mn
+  }
+
+  toDateTime = a => {
+    const aa = new Date(a)
+    const d = aa.getDate()
+    const m = aa.getMonth() + 1
+    const y = aa.getFullYear()
+    const h = aa.getHours()
+    const hh = h < 10 ? '0' + h : h
+    const mm = aa.getMinutes()
+    const mn = mm < 10 ? '0' + mm : mm
+    const x = aa.getSeconds()
+    const xx = x < 10 ? '0' + x : x
+    return y + "-" + m + "-" + d + " " + hh + ":" + mn + ":" + xx
+  }
+
+  selectHandler = (e, { name, value }) => {
     this.setState({ [name]: value })
   }
 
-  createInvoiceHandler = () => {
-    //TODO Jane : api for inserting to database
-    const { selectedInvoice: invoice, selectedMessenger: messenger, selectedCar: car } = this.state
-    console.log("need send api to backend function")
-    // console.log(invoice, messenger, car)
-    console.log(this.state)
-    this.loadSendingRound()
+  createInvoiceHandler = async () => {
+    const { selectedInvoice, selectedMessenger, selectedCar, departTime, arriveTime } = this.state
+    const result = await axios.post(url + '/sendinground/add', {
+      Invoice_ID: selectedInvoice,
+      Messenger_SSN: selectedMessenger,
+      License_plate: selectedCar,
+      Depart_time: this.toDateTime(departTime),
+      Arrive_time: this.toDateTime(arriveTime)
+    })
+    this.setState({ selectedInvoice: [], selectedMessenger: null, selectedCar: null, departTime: new Date(), arriveTime: new Date() })
+    this.onUpdate()
   }
 
-  loadSendingRound = async () => {
+  deleteSendingRound = async () => {
+    const ID = this.state.modalID
+    console.log(ID)
+    const result = await axios.delete(url + '/sendinground/del', { data: { ID } })
+    console.log(result)
+    if (result.data.affectedRows) {
+      this.onUpdate()
+      this.setState({ open: false })
+    }
+
+  }
+
+  async onUpdate() {
     const sendingResult = await axios.get(url + '/sendinground')
     const sendingRounds = sendingResult.data
-    this.setState({ sendingRounds })
-  }
-
-  deleteSendingRound = async (sendingRound) => {
-    // console.log(sendingRound)
-    // const result = await axios.delete(url + '/sendinground/del', { data: sendingRound })
-    // console.log(result)
-    // this.loadSendingRound()
-
-  }
-
-  async componentDidMount() {
-    this.loadSendingRound()
+    console.log(sendingRounds)
     const carResult = await axios.get(url + '/sendinground/car')
     const cars = carResult.data
     const messengerResult = await axios.get(url + '/sendinground/messenger')
     const messengers = messengerResult.data
     const invoiceResult = await axios.get(url + '/sendinground/invoice')
     const invoices = invoiceResult.data
-    this.setState({ cars, messengers, invoices })
+    this.setState({ cars, messengers, invoices, sendingRounds })
+  }
+
+  async componentDidMount() {
+    this.onUpdate()
   }
 
   render() {
+    const tableHeader = ["ID", "Depart time", "Arrive time", "Messenger SSN", "License plate", "Invoice ID", "Delete"]
+    const currentTime = new Date();
+    const { open } = this.state
     return (
       <div
         style={{
           display: "flex", flexDirection: "column", width: "60%", margin: "5vh 30vh",
         }}
       >
-        {/* //   creating sending round (choose invoice+ messenger+ car) Showing the
-        //   sending round */}
-
-        {/* TODOBYJANE */}
         <div style={{ backgroundColor: "#DCDDDE", padding: "14px", borderRadius: "0 0 .28571429rem .28571429rem" }}>
-
           <div style={{ display: "flex", flexWrap: "wrap" }}>
             <div style={{ display: "flex", flexDirection: "column", marginTop: "1vh", width: "50%" }}>
               <span><h5>Invoice</h5></span>
@@ -84,6 +119,7 @@ class Sending extends React.Component {
                 style={{ margin: "1vh 4vh 0 0" }}
                 key="Invoice"
                 placeholder='select invoice'
+                multiple
                 clearable
                 selection
                 name="selectedInvoice"
@@ -156,28 +192,39 @@ class Sending extends React.Component {
         <Table>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>ID</Table.HeaderCell>
-              <Table.HeaderCell>Depart time</Table.HeaderCell>
-              <Table.HeaderCell>Arrive time</Table.HeaderCell>
-              <Table.HeaderCell>Messenger SSN</Table.HeaderCell>
-              <Table.HeaderCell>License plate</Table.HeaderCell>
-              <Table.HeaderCell>Delete</Table.HeaderCell>
+              {tableHeader.map(i => (<Table.HeaderCell>{i}</Table.HeaderCell>))}
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {this.state.sendingRounds.map((sendingRound) => (
-              <Table.Row key={sendingRound.ID}>
-                <Table.Cell>{sendingRound.ID}</Table.Cell>
-                <Table.Cell>{sendingRound.Depart_time}</Table.Cell>
-                <Table.Cell>{sendingRound.Arrive_time}</Table.Cell>
-                <Table.Cell>{sendingRound.Messenger_SSN}</Table.Cell>
-                <Table.Cell>{sendingRound.License_plate}</Table.Cell>
-                <Table.Cell><Icon link name='close' onClick={() => this.deleteSendingRound(sendingRound)} /></Table.Cell>
+            {this.state.sendingRounds.map(({ ID, Depart_time, Arrive_time, Messenger_SSN, License_plate, Invoice_ID }) => (
+              <Table.Row key={ID}>
+                <Table.Cell>{ID}</Table.Cell>
+                <Table.Cell>{this.toDate(Depart_time)}</Table.Cell>
+                <Table.Cell>{this.toDate(Arrive_time)}</Table.Cell>
+                <Table.Cell>{Messenger_SSN}</Table.Cell>
+                <Table.Cell>{License_plate}</Table.Cell>
+                <Table.Cell>
+                  {Invoice_ID.join(', ')}
+                </Table.Cell>
+                <Table.Cell>
+                  {currentTime.getTime() < new Date(Depart_time).getTime() &&
+                    <Icon
+                      link
+                      name='close'
+                      onClick={() => this.setState({ open: true, modalID: ID })}
+                    />
+                  }
+                  <Modal
+                    open={open}
+                    onCancel={() => this.setState({ open: false, modalID: null })}
+                    onConfirm={() => this.deleteSendingRound()}
+                  />
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
-      </div >
+      </div>
 
     );
   }

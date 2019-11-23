@@ -5,7 +5,7 @@ const myModal = ({ open, onCancel, onConfirm }) => (
     <Modal open={open} size='mini'>
         <Modal.Content>
             <p>
-                Do you want to save?
+                Are you sure?
             </p>
         </Modal.Content>
         <Modal.Actions>

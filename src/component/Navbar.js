@@ -7,24 +7,20 @@ import {
     Link
 } from "react-router-dom";
 export default class Navbar extends Component {
-    state = { activeItem: 'home', Username: "", Password: "", isAdmin: false }
+    state = { activeItem: 'home', Username: "", Password: "" }
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name })
     handleChange = (e, { name, value }) => {
-        if (name == "isAdmin") {
-            this.setState({ isAdmin: !this.state.isAdmin })
-        } else {
-            this.setState({ [name]: value })
-        }
+        this.setState({ [name]: value })
         this.props.removeError()
     }
     handleLogout = () => {
-        this.setState({ activeItem: 'home', Username: "", Password: "", isAdmin: false })
+        this.setState({ activeItem: 'home', Username: "", Password: "" })
         this.props.handleLogout()
     }
 
     render() {
-        const { activeItem, Username, Password, isAdmin } = this.state
+        const { activeItem, Username, Password } = this.state
         const { user, error } = this.props
 
         return (
@@ -53,7 +49,7 @@ export default class Navbar extends Component {
                                     onClick={this.handleItemClick}
                                 />
                             </Link>
-                            {!isAdmin &&
+                            {user && !user.isAdmin &&
                                 <Link to="/review">
                                     <Menu.Item
                                         name='review'
@@ -62,7 +58,7 @@ export default class Navbar extends Component {
                                     />
                                 </Link>
                             }
-                            {isAdmin &&
+                            {user && user.isAdmin &&
                                 <Fragment>
                                     <Link to="/sending">
                                         <Menu.Item
@@ -115,7 +111,7 @@ export default class Navbar extends Component {
                                 <Form
                                     inverted
                                     size="tiny"
-                                    onSubmit={() => this.props.handleLogin({ Username, Password, isAdmin })}
+                                    onSubmit={() => this.props.handleLogin({ Username, Password })}
                                 >
                                     <Form.Group>
                                         <Form.Input
@@ -129,12 +125,6 @@ export default class Navbar extends Component {
                                             type="password"
                                             placeholder='Password'
                                             name='Password'
-                                            onChange={this.handleChange}
-                                        />
-                                        <Form.Checkbox
-                                            name="isAdmin"
-                                            label="admin"
-                                            style={{ marginTop: "8px" }}
                                             onChange={this.handleChange}
                                         />
                                         <Form.Button color="teal" content='Submit'>
